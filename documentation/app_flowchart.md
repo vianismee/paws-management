@@ -1,14 +1,17 @@
 flowchart TD
-  Start[Landing Page]
-  SignUpPage[Sign Up Page]
-  SignInPage[Sign In Page]
-  AuthAPI[Authentication API Endpoint]
-  DashboardPage[Dashboard Page]
-  Start -->|Select Sign Up| SignUpPage
-  Start -->|Select Sign In| SignInPage
-  SignUpPage -->|Submit Credentials| AuthAPI
-  SignInPage -->|Submit Credentials| AuthAPI
-  AuthAPI -->|Success| DashboardPage
-  AuthAPI -->|Error| SignUpPage
-  AuthAPI -->|Error| SignInPage
-  DashboardPage -->|Click Logout| Start
+    Start[Start]
+    Start --> A[Choose Auth Option]
+    A --> SignIn[Sign In Page]
+    A --> SignUp[Sign Up Page]
+    SignIn --> FormSubmit[Submit Credentials]
+    SignUp --> FormSubmit[Submit Credentials]
+    FormSubmit --> AuthClient[Client Auth Functions]
+    AuthClient --> APIRoute[API Auth Route]
+    APIRoute --> BetterAuth[Better Auth Logic]
+    BetterAuth --> Drizzle[Drizzle ORM]
+    Drizzle --> Postgres[PostgreSQL Database]
+    BetterAuth --> AuthResult{Auth Success Or Failure}
+    AuthResult -->|Success| Redirect[Redirect To Dashboard]
+    AuthResult -->|Failure| Error[Show Error Message]
+    Redirect --> Dashboard[Dashboard Page]
+    Dashboard --> End[End]
