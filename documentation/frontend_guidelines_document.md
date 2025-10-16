@@ -1,180 +1,217 @@
-# Frontend Guideline Document
+# Frontend Guidelines Document
 
-This document explains, in simple terms, how the frontend of the `codeguide-starter` project is structured, styled, and built. Anyone—technical or not—can read this and understand which tools are used, how components fit together, and what practices keep the app fast, reliable, and easy to maintain.
+# Frontend Guideline Document for paws-management
 
----
+This document outlines the comprehensive frontend architecture, design principles, and technologies used in the paws-management production management system. It covers business-specific UI patterns, data visualization requirements, and user experience considerations for managing inventory, formulations, and production costs.
 
 ## 1. Frontend Architecture
 
-**Core Frameworks and Libraries**
-- **Next.js (App Router)**: A React-based framework that provides file-based routing, server-side rendering (SSR), static site generation (SSG), and built-in API endpoints all in one project.
-- **React 18**: The library for building user interfaces using components and hooks.
-- **TypeScript**: A superset of JavaScript that adds static types, helping catch errors early and making the code easier to understand and refactor.
+### Core Frameworks and Libraries
+- **Next.js (App Router)**: Provides file-based routing, server-side rendering (SSR), and static site generation (SSG) in one framework. It handles both page rendering and API routes.
+- **TypeScript**: Adds type safety on top of JavaScript, catching errors early and making the code easier to navigate.
+- **Tailwind CSS**: Offers a utility-first approach to styling, speeding up development with pre-built classes.
 
-**How It’s Organized**
-- The `app/` folder holds all pages and layouts. Each URL path corresponds to a folder:
-  - `/app/sign-in` and `/app/sign-up` for authentication pages.
-  - `/app/dashboard` for the protected user area.
-  - API routes live under `/app/api/auth/route.ts`.
-- Each route folder contains:
-  - `page.tsx` (the UI for that page)
-  - `layout.tsx` (wrapping structure, like headers or sidebars)
-  - Styles (e.g., `theme.css` in the dashboard).
+### Business UI Components
+- **shadcn/ui**: A set of accessible, ready-to-use React components built on Radix UI and styled with Tailwind.
+- **@tanstack/react-table**: Advanced data table component for managing inventory, formulas, and production data with sorting, filtering, and pagination.
+- **@dnd-kit/core**: Drag-and-drop functionality for intuitive formulation management and ingredient ordering.
+- **react-hook-form**: Form validation with zod schemas for ensuring data integrity in business operations.
+- **@tabler/icons-react**: Comprehensive icon library for consistent business application iconography.
 
-**Why This Works**
-- **Scalability**: Adding new pages or features means creating new folders with their own layouts and pages. You don’t have to touch a central router file.
-- **Maintainability**: Code is separated by feature. Backend logic (API routes) lives alongside the frontend code for that feature, reducing context-switching.
-- **Performance**: Next.js pre-renders pages where possible and splits code by route, so users download only what’s needed.
+### Data Visualization and User Experience
+- **recharts**: Chart library for cost analysis, inventory trends, and business metrics visualization.
+- **sonner**: Toast notification system for user feedback on business operations.
+- **date-fns**: Date manipulation for production dates, expiry tracking, and reporting.
+- **next-themes**: Manages light/dark mode toggling with CSS variables and a simple API.
+- **decimal.js**: High-precision decimal arithmetic for financial calculations and cost analysis.
 
----
+### Scalability, Maintainability, and Performance
+- **Modular Routing**: The App Router lets us split pages and layouts into folders under `/app`. Each business function (inventory, formulas, COGS) has dedicated routes.
+- **Component-Based Structure**: Reusable UI pieces live in `/components/ui` and business-specific components in `/components`.
+- **Type Safety**: TypeScript and Drizzle ORM ensure that database queries and component props match expected shapes, crucial for financial data.
+- **Client-Side Operations**: Direct database connections provide responsive user experience for business operations.
+- **Virtualization**: Data tables support virtualization for handling large inventories efficiently.
+- **Lightweight CSS**: Tailwind's tree-shaking strips out unused styles, keeping bundles small for business users with varying internet speeds.
 
 ## 2. Design Principles
 
-1. **Usability**: Forms give instant feedback. Buttons and links are clearly labeled.
-2. **Accessibility**: Semantic HTML, proper color contrast, and focus outlines ensure people using screen readers or keyboards can navigate easily.
-3. **Responsiveness**: Layouts adapt from mobile (320px) up to large desktop screens. CSS media queries ensure content resizes and stacks neatly.
-4. **Consistency**: Shared global layout and styling mean pages look and feel like part of the same app.
+### Business Application Usability
+- **Clear Business Context**: All interfaces clearly show their business purpose (inventory, formulation, COGS analysis).
+- **Action-Oriented Design**: Primary actions (Add Material, Create Formula, Calculate COGS) are prominently displayed.
+- **Data-Driven Feedback**: Real-time validation, cost calculations, and inventory status updates provide immediate business insights.
+- **Consistent Workflows**: Similar patterns across inventory, packaging, and labels management reduce learning curve.
 
-**How We Apply Them**
-- Form fields use `aria-*` attributes and visible labels.
-- Error messages appear inline under inputs.
-- Navigation elements (header, sidebar) appear in every layout.
-- Breakpoints at 480px, 768px, and 1024px guide responsive adjustments.
+### Accessibility
+- **Keyboard Navigation**: All interactive elements (buttons, links, form fields, data table rows) are reachable via Tab and have visible focus outlines.
+- **ARIA Attributes**: shadcn/ui components include ARIA labels and roles by default; custom components follow WCAG guidelines.
+- **Screen Reader Support**: Data tables include proper headers and descriptions for financial data accessibility.
+- **High Contrast**: Color choices meet WCAG AA standards with additional contrast for financial data (costs, margins).
+- **Focus Management**: Modal dialogs and form validation manage focus appropriately for business users.
 
----
+### Responsiveness for Business Use
+- **Mobile-First**: Critical business functions (view inventory, check stock levels, approve formulas) work on mobile devices.
+- **Tablet Optimization**: Formulation building and COGS analysis are optimized for tablet use with appropriate touch targets.
+- **Desktop Enhancement**: Full dashboard functionality with multi-window workflows for desktop business users.
+- **Adaptive Layouts**: Sidebar collapses on mobile, data tables reformat for small screens, charts resize appropriately.
+
+### Data Visualization Principles
+- **Clear Hierarchy**: Important financial metrics (costs, margins) are visually prominent.
+- **Consistent Color Coding**: Green (healthy), yellow (warning), red (critical) for inventory and financial status.
+- **Progressive Disclosure**: Detailed breakdowns available on demand without cluttering main views.
+- **Business Context**: Charts and graphs include clear labels and business-relevant timeframes.
 
 ## 3. Styling and Theming
 
-**Approach**
-- **Global Styles (`globals.css`)**: Resets, base typography, and common utility classes.
-- **Section Styles (`theme.css` in dashboard)**: Styles specific to the dashboard area (colors, layouts).
-- We follow a **BEM-inspired naming** for classes when writing new CSS to avoid conflicts and keep selectors clear.
+### Styling Approach
+- **Utility-First CSS**: Tailwind classes (e.g., `bg-white`, `text-gray-800`, `p-4`) compose most styles.
+- **Component Styling**: shadcn/ui components are styled with Tailwind variants and can be extended via the `cn()` helper for class merging.
+- **Custom CSS**: Any project-wide overrides or global styles go into `globals.css`.
 
-**Visual Style**: Modern flat design with subtle shadows for depth. Clear spacing and large touch targets on mobile.
+### Theming
+- **Dark/Light Mode**: Managed by next-themes. We define CSS variables in `:root` and `[data-theme='dark']`.
+- **Theme Toggle**: A `ThemeToggle` component switches themes by reading and setting the user’s preference.
 
-**Color Palette**
-- **Primary Blue**: #1E90FF  (buttons, highlights)
-- **Secondary Navy**: #2C3E50  (header, sidebar background)
-- **Accent Cyan**: #00CEC9  (links, hover states)
-- **Neutral Light**: #F8F9FA  (page backgrounds)
-- **Neutral Dark**: #2D3436  (text, icons)
+### Visual Style
+- **Overall Style**: Modern flat design with subtle depth (soft shadows, rounded corners, clean lines).
+- **Glassmorphism**: Used sparingly for modals or overlay cards (backdrop blur and semi-transparent backgrounds).
 
-**Font**
-- **Inter** (sans-serif): Clean, modern, highly legible on screens. Fallback to system fonts like `-apple-system, BlinkMacSystemFont, sans-serif`.
+### Color Palette
+- **Primary**: Indigo 600 (#4F46E5)
+- **Secondary**: Slate 500 (#64748B)
+- **Accent**: Emerald 500 (#10B981)
+- **Background Light**: Gray 50 (#F9FAFB)
+- **Background Dark**: Gray 900 (#111827)
+- **Text Dark**: Gray 800 (#1F2937)
+- **Text Light**: Gray 200 (#E5E7EB)
 
-**Theming**
-- To keep a consistent look, all colors and font sizes are defined in CSS variables in `globals.css`:
-  ```css
-  :root {
-    --color-primary: #1E90FF;
-    --color-secondary: #2C3E50;
-    --color-accent: #00CEC9;
-    --color-bg: #F8F9FA;
-    --color-text: #2D3436;
-    --font-family: 'Inter', sans-serif;
-  }
-  ```
-- Components consume these variables for backgrounds, borders, and text.
-
----
+### Typography
+- **Font Family**: Inter (system fallbacks: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`)
+- **Font Weights**: Regular (400), Medium (500), Bold (700)
 
 ## 4. Component Structure
 
-**File Layout**
-- `/app` (top-level folder)
-  - `layout.tsx`: Global wrapper (nav, footer).
-  - `page.tsx`: Landing or redirect logic.
-  - `/sign-in`, `/sign-up`, `/dashboard`, `/api/auth`
-    - Each has its own `layout.tsx` and `page.tsx`.
-- **Common Components**: Put reusable UI pieces (buttons, inputs, cards) into a `/components` folder at the project root.
+### Organization
+- `/components/ui`: Core building blocks (Button, Input, Card, Table, etc.) from shadcn/ui.
+- `/components`: Business-specific pieces (AppSidebar, DataTables, FormulaBuilder, CostAnalysis).
+- `/app/dashboard/[feature]`: Feature-specific pages and layouts for inventory, formulas, COGS.
 
-**Reusability & Encapsulation**
-- Components are self-contained: each has its own styles (class names scoped to BEM) and behavior.
-- Shared logic (e.g., API calls) lives in `/lib` or `/hooks` so pages import only what they need.
+### Business Component Architecture
+- **Data Tables**: Specialized table components for Materials, Packaging, Labels, Formulas, and Production Batches.
+- **Form Components**: Reusable form components for material entry, formulation building, and production tracking.
+- **Calculation Components**: Real-time COGS calculators, pricing rule editors, and margin analyzers.
+- **Visualization Components**: Cost breakdown charts, inventory trend graphs, and production metrics.
 
-**Benefits**
-- **Easier Maintenance**: Fix a bug in one button component, and it updates everywhere.
-- **Better Team Collaboration**: Developers can own specific components or pages without stepping on each other’s code.
+### Reuse and Consistency
+- **Atomic Design**: Small, focused components are composed into larger business features.
+- **Type-Safe Props**: Components accept well-defined TypeScript interfaces for business data.
+- **Validation Schemas**: Shared zod schemas ensure consistent validation across forms.
 
----
+### Benefits of Business Component Architecture
+- **Maintainability**: Business logic changes in one component update everywhere it's used.
+- **Data Integrity**: Type safety ensures consistent handling of financial and inventory data.
+- **Testing**: Each component can be unit tested with realistic business data scenarios.
 
 ## 5. State Management
 
-**Current Approach**
-- **Local State**: React `useState` and `useEffect` for form values, loading flags, and error messages.
-- **Server State**: Fetch data (e.g., dashboard JSON) directly in page components or using React Server Components.
+### Business Data Management Approach
+- **Local Component State**: React's `useState` for form inputs, UI toggles, and temporary calculation states.
+- **Client-Side Database State**: Direct database connections for real-time inventory and formulation data.
+- **Optimistic Updates**: UI updates immediately with database operations, rolling back on errors.
+- **Calculation State**: Decimal.js instances for financial calculations with precision guarantees.
 
-**Sharing State**
-- **React Context**: A simple auth context (`AuthContext`) holds the user’s session info, login/logout methods, and makes it available to any component.
-  - Located in `/context/AuthContext.tsx`.
+### Data Flow for Business Operations
+1. User actions update local state (form fields, formulation percentages, cost inputs).
+2. Client-side database operations directly modify data via Drizzle ORM.
+3. Real-time calculations update COGS, pricing, and inventory status.
+4. Components re-render immediately with new business data.
+5. Error states trigger rollbacks and user notifications.
 
-**Future Growth**
-- If complexity grows (deeply nested data, multiple user roles), consider:
-  - **Redux Toolkit** or **Zustand** for centralized state.
-  - Query libraries like **React Query** or **SWR** for caching and re-fetch logic.
-
----
+### Performance Considerations
+- **Query Optimization**: Database queries include proper indexing for business data retrieval.
+- **Debounced Calculations**: Complex COGS calculations are debounced to prevent excessive re-computation.
+- **Table Virtualization**: Large datasets use virtual scrolling for memory efficiency.
+- **Cache Management**: Frequently accessed data (material costs, formulas) is cached appropriately.
 
 ## 6. Routing and Navigation
 
-**Routing Library**
-- Built into **Next.js App Router**. Each folder under `/app` becomes a route automatically.
-- Layouts (`layout.tsx`) and pages (`page.tsx`) are colocated for that route.
+### Routing
+- **File-Based Routing**: The `/app` folder defines routes:
+  - `/app/sign-in` and `/app/sign-up` for authentication.
+  - `/app/dashboard` for the protected dashboard.
+  - `/app/api/auth/[...all]/route.ts` for all auth API calls.
+- **Nested Layouts**: Root `layout.tsx` wraps every page with theme and header; dashboard layout adds sidebar and top bar.
 
-**Protected Pages**
-- The dashboard’s `layout.tsx` checks for a valid session (via cookie or context). If missing, it issues a server-side redirect to `/sign-in`.
-
-**Navigation Structure**
-- **Header**: Present in global layout with the app logo and conditional Sign In/Sign Out links.
-- **Sidebar**: Included in `dashboard/layout.tsx` with links to dashboard sections (expandable in future).
-
----
+### Navigation
+- **Next.js `Link`**: Used for client-side transitions between pages.
+- **Sidebar**: Highlights the current route and adapts to mobile screens (collapsible).
+- **Redirects**: Unauthenticated users are sent to `/sign-in`; authenticated users landing on `/sign-in` get sent to `/dashboard`.
 
 ## 7. Performance Optimization
 
-1. **Code Splitting**: Next.js automatically breaks code by route. Users only load JS needed for the current page.
-2. **Lazy Loading**: For large components (charts, maps), wrap with `next/dynamic` to load them only when needed.
-3. **Image Optimization**: Use Next.js `<Image>` component to serve responsive, compressed images.
-4. **Caching**:
-   - Static assets (CSS, fonts) use long cache headers.
-   - API responses can be cached or ISR (Incremental Static Regeneration) applied.
-5. **Minification & Compression**: Next.js production builds automatically minify JS and CSS, and enable Brotli/Gzip on the CDN.
-
-These steps ensure fast page loads and smooth interactions.
-
----
+- **Automatic Code Splitting**: Next.js loads only the code needed for each page.
+- **Lazy Loading**: Heavy components or charts can be loaded with `next/dynamic`.
+- **Image Optimization**: Next.js Image component (`<Image>`) serves compressed and responsive images.
+- **Tailwind JIT**: Generates only the CSS classes in use, reducing bundle size.
+- **Caching**: Use HTTP caching headers for static assets and ISR (Incremental Static Regeneration) for data that changes infrequently.
 
 ## 8. Testing and Quality Assurance
 
-**Unit Tests**
-- **Jest** + **React Testing Library** for components and utility functions.
-- Example: test that the Sign In form shows an error message when fields are empty.
+### Testing Strategies
+- **Unit Tests**: Jest + React Testing Library for components and utility functions.
+- **Integration Tests**: Test interactions between API routes and the database (using a test database).
+- **End-to-End Tests**: Cypress or Playwright for user flows (sign-in, dashboard navigation).
 
-**Integration Tests**
-- Combine multiple components and hooks; test API calls with **msw** (Mock Service Worker).
+### Tools and Practices
+- **ESLint**: Enforces code style and catches common errors.
+- **Prettier**: Formats code consistently.
+- **Type Checking**: `tsc --noEmit` as part of CI to ensure type safety.
+- **Pull Request Reviews**: Checklist for accessibility, performance, and security.
 
-**End-to-End (E2E) Tests**
-- **Cypress** or **Playwright** to simulate real user flows: signing up, logging in, and viewing the dashboard.
+## 9. Business-Specific UI Patterns
 
-**Linting & Formatting**
-- **ESLint** enforces code style and catches common bugs.
-- **Prettier** applies consistent formatting.
-- **Git Hooks** (via Husky) run linting/tests before each commit.
+### Data Entry Patterns
+- **Progressive Disclosure**: Complex forms (formulation building) show relevant fields based on context.
+- **Real-time Validation**: Business rules (formula percentages, cost calculations) validate immediately.
+- **Auto-calculation**: Material costs, COGS, and pricing update automatically as users enter data.
+- **Batch Operations**: Support for bulk updates in inventory management.
 
-**Continuous Integration (CI)**
-- **GitHub Actions** runs tests and lint on each pull request, preventing regressions.
+### Data Display Patterns
+- **Financial Formatting**: Currency values displayed with appropriate precision and formatting.
+- **Status Indicators**: Visual indicators for inventory levels, production status, and cost margins.
+- **Drill-down Capability**: Summary data allows users to drill down to detailed breakdowns.
+- **Comparative Views**: Side-by-side comparisons for formula versions or cost analyses.
+
+### Interaction Patterns
+- **Drag-and-Drop**: Intuitive formulation building with visual feedback.
+- **Inline Editing**: Quick updates to inventory levels and costs without modal dialogs.
+- **Contextual Actions**: Actions appear based on data state (reorder when stock is low).
+- **Keyboard Shortcuts**: Power user shortcuts for common business operations.
+
+## 10. Conclusion and Overall Frontend Summary
+
+The paws-management frontend is designed specifically for production management business needs. By combining modern web technologies with business-specific UI patterns, we deliver a comprehensive solution for inventory management, formulation development, and cost analysis.
+
+**Key Strengths:**
+- **Business-Focused**: Every design decision serves specific production management workflows
+- **Data-Driven**: Real-time calculations and immediate feedback for business decisions
+- **Scalable Architecture**: Component-based design supports growing business requirements
+- **Performance Optimized**: Client-side operations and efficient data handling for responsive business use
+- **Type Safety**: Critical for financial data integrity and business logic accuracy
+
+**Business Value:**
+- **Reduced Training Costs**: Intuitive interfaces minimize learning curves for business users
+- **Faster Decision Making**: Real-time data and calculations enable quick business decisions
+- **Data Accuracy**: Type safety and validation prevent costly business errors
+- **Mobile Accessibility**: Critical business functions available on any device
+
+These guidelines ensure the frontend continues to serve business needs effectively while maintaining technical excellence and user experience quality.
 
 ---
-
-## 9. Conclusion and Overall Frontend Summary
-
-The `codeguide-starter` frontend is built on modern, well-established tools—Next.js, React, and TypeScript—and follows clear principles around usability, accessibility, and maintainability. Its file-based structure, component-driven approach, and CSS-variable theming keep things organized and consistent.
-
-Key takeaways:
-- **Scalable Structure**: Add new features by creating new folders under `app/` without touching a central router.
-- **Component Reuse**: Shared UI pieces live in one place, making updates quick and error-free.
-- **Simple Styling**: Global and section-specific CSS, underpinned by CSS variables, ensures a unified look.
-- **Smooth Performance**: Next.js automatic optimizations plus best practices like lazy loading and caching.
-- **Quality Assurance**: A testing plan that covers unit, integration, and E2E scenarios, enforced by CI.
-
-With these guidelines, any developer coming into the project can understand how the pieces fit together, how to follow existing patterns, and how to keep the app fast, reliable, and easy to grow.
+**Document Details**
+- **Project ID**: 9abf8165-5741-488d-aa70-1677e11be201
+- **Document ID**: dcefa0d6-53ab-4800-b36e-89c08b171ea2
+- **Type**: custom
+- **Custom Type**: frontend_guidelines_document
+- **Status**: completed
+- **Generated On**: 2025-10-15T15:43:40.293Z
+- **Last Updated**: N/A

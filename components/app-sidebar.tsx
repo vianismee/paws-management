@@ -15,10 +15,13 @@ import {
   IconFolder,
   IconHelp,
   IconListDetails,
+  IconPackage,
   IconReport,
   IconSearch,
   IconSettings,
   IconUsers,
+  IconCalculator,
+  IconFlask,
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/nav-documents"
@@ -39,74 +42,84 @@ const staticData = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: IconDashboard,
     },
     {
-      title: "Lifecycle",
+      title: "Inventory Management",
       url: "#",
-      icon: IconListDetails,
+      icon: IconPackage,
+      items: [
+        {
+          title: "Raw Materials",
+          url: "/dashboard/inventory/materials",
+          description: "Manage ingredients and raw materials",
+        },
+        {
+          title: "Packaging",
+          url: "/dashboard/inventory/packaging",
+          description: "Track containers and packaging supplies",
+        },
+        {
+          title: "Labels",
+          url: "/dashboard/inventory/labels",
+          description: "Manage product labels and printing",
+        },
+      ],
+    },
+    {
+      title: "Formulation Management",
+      url: "#",
+      icon: IconFlask,
+      items: [
+        {
+          title: "Formulas",
+          url: "/dashboard/formulas",
+          description: "Create and manage product formulas",
+        },
+        {
+          title: "Production Batches",
+          url: "/dashboard/production",
+          description: "Track production batches and material usage",
+        },
+      ],
+    },
+    {
+      title: "Cost Analysis",
+      url: "#",
+      icon: IconCalculator,
+      items: [
+        {
+          title: "COGS Calculator",
+          url: "/dashboard/cogs",
+          description: "Calculate cost of goods sold",
+        },
+        {
+          title: "Pricing Rules",
+          url: "/dashboard/pricing",
+          description: "Set pricing strategies and margins",
+        },
+      ],
     },
     {
       title: "Analytics",
       url: "#",
       icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Inventory Reports",
           url: "#",
+          description: "Inventory analysis and trends (Coming Soon)",
         },
         {
-          title: "Archived",
+          title: "Production Analytics",
           url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
+          description: "Production efficiency metrics (Coming Soon)",
         },
         {
-          title: "Archived",
+          title: "Cost Reports",
           url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
+          description: "Cost analysis and profitability (Coming Soon)",
         },
       ],
     },
@@ -123,26 +136,29 @@ const staticData = {
       icon: IconHelp,
     },
     {
-      title: "Search",
+      title: "Documentation",
       url: "#",
-      icon: IconSearch,
+      icon: IconListDetails,
     },
   ],
   documents: [
     {
-      name: "Data Library",
+      name: "Data Export",
       url: "#",
       icon: IconDatabase,
+      description: "Export data for analysis (Coming Soon)",
     },
     {
       name: "Reports",
       url: "#",
       icon: IconReport,
+      description: "Generate business reports (Coming Soon)",
     },
     {
-      name: "Word Assistant",
+      name: "API Documentation",
       url: "#",
-      icon: IconFileWord,
+      icon: IconFileDescription,
+      description: "API reference and integration guides (Coming Soon)",
     },
   ],
 }
@@ -170,8 +186,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="/">
-                <Image src="/codeguide-logo.png" alt="CodeGuide" width={32} height={32} className="rounded-lg" />
-                <span className="text-base font-semibold font-parkinsans">CodeGuide</span>
+                <Image src="/codeguide-logo.png" alt="PAWS Management" width={32} height={32} className="rounded-lg" />
+                <span className="text-base font-semibold font-parkinsans">PAWS Management</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

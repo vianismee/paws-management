@@ -1,90 +1,286 @@
 # Tech Stack Document
 
-This document explains the key technologies chosen for the **codeguide-starter** project. It’s written in everyday language so anyone—technical or not—can understand why each tool was picked and how it supports the application.
+# Technology Stack Document for paws-management
 
-## 1. Frontend Technologies
-The frontend is everything the user sees and interacts with. For this project, we’ve used:
+This document outlines the comprehensive technology stack chosen for the **paws-management** production management system. It explains each technology in everyday language and clarifies why it was selected and how it fits into the overall business management application.
 
+## Frontend Technologies
+
+The frontend is what your users see and interact with in their web browser for managing their production business. Here's our comprehensive stack:
+
+**Core Framework & Language**
 - **Next.js (App Router)**
-  - A React framework that makes page routing, server-side rendering, and API routes very simple.
-  - Enhances user experience by pre-rendering pages on the server or at build time, leading to faster initial load.
-- **React 18**
-  - The underlying library for building user interfaces with reusable components.
-  - Provides a smooth, interactive experience thanks to its virtual DOM and modern hooks.
+  - Provides both page routing and built-in API routes in a single framework
+  - Enables server-side rendering (SSR) and static site generation (SSG) for faster load times
+  - Supports client-side database operations for optimal performance
 - **TypeScript**
-  - A superset of JavaScript that adds types (labels for data).
-  - Helps catch errors early during development and makes the code easier to maintain.
-- **CSS (globals.css & theme.css)**
-  - **globals.css** applies base styles (fonts, colors, resets) across the entire app.
-  - **dashboard/theme.css** defines the look and feel specific to the dashboard area.
-  - This separation keeps styles organized and avoids accidental style conflicts.
+  - Adds strict typing to JavaScript, helping catch errors early and making code easier to maintain
+  - Ensures type safety across the entire application, from UI components to database operations
 
-By combining these tools, we have a clear structure (Next.js folders for pages and layouts), safer code (TypeScript), and flexible styling with vanilla CSS.
+**UI Framework & Styling**
+- **Tailwind CSS**
+  - A utility-first CSS framework that lets us style elements quickly and consistently without writing custom CSS from scratch
+  - Provides responsive design utilities for mobile-friendly business management interface
+- **shadcn/ui**
+  - A set of ready-made, accessible UI components (buttons, inputs, cards, tables, etc.) built on Radix UI and styled with Tailwind
+  - Provides professional-grade components perfect for business applications
+- **next-themes**
+  - Manages light/dark mode toggling in a simple, declarative way for comfortable long-term usage
 
-## 2. Backend Technologies
-The backend handles data, user accounts, and the logic behind the scenes. Our choices here are:
+**Advanced UI Components**
+- **@tanstack/react-table**
+  - Powerful table component for managing large datasets (inventory, formulas, production batches)
+  - Provides sorting, filtering, pagination, and virtualization for smooth performance
+- **@dnd-kit/core**
+  - Drag-and-drop functionality for intuitive formulation management
+  - Allows users to reorder ingredients and manage formulas visually
+- **react-hook-form with @hookform/resolvers and zod**
+  - Form validation library ensuring data integrity for business-critical information
+  - Provides real-time validation and user-friendly error messages
+- **@tabler/icons-react**
+  - Comprehensive icon library for consistent visual language throughout the application
 
-- **Next.js API Routes**
-  - Allows us to write server-side code (`route.ts` files) alongside our frontend in the same project.
-  - Runs on Node.js, so we can handle requests like sign-up, sign-in, and data fetching in one place.
-- **Node.js Runtime**
-  - The JavaScript environment on the server that executes our API routes.
-- **bcrypt** (npm package)
-  - A library for hashing passwords securely before storing them.
-  - Ensures that even if someone got access to our data, raw passwords aren’t visible.
-- **(Optional) NextAuth.js or JWT**
-  - While this starter kit shows a custom authentication flow, it can easily integrate services like NextAuth.js for email-based login or JWT (JSON Web Tokens) for stateless sessions.
+**Data Visualization & User Experience**
+- **recharts**
+  - Chart library for cost analysis, inventory trends, and business analytics
+  - Provides interactive charts for COGS analysis and production metrics
+- **sonner**
+  - Toast notification system for user feedback on operations
+- **date-fns**
+  - Date manipulation library for production dates, expiry tracking, and reporting
 
-These components work together to receive user credentials, verify or store them securely, manage sessions or tokens, and deliver protected data back to the frontend.
+**Performance & Animation**
+- **tailwind-merge & tw-animate-css**
+  - Utility for merging Tailwind classes and smooth animations
+  - Ensures consistent styling and smooth transitions for better user experience
 
-## 3. Infrastructure and Deployment
-Infrastructure covers where and how we host the app, as well as how changes get delivered:
+How these choices enhance the business user experience:
 
+- Fast, responsive pages for efficient inventory and formulation management
+- Professional interface suitable for business operations with consistent design
+- Drag-and-drop formulation building for intuitive product development
+- Advanced data tables for handling large inventories and production histories
+- Real-time validation preventing data entry errors
+- Visual analytics for cost analysis and business insights
+- Mobile-friendly interface for checking inventory and production status on-the-go
+
+## Backend Technologies
+
+The backend powers data storage, user authentication, and comprehensive business logic for production management. Our stack includes:
+
+**Authentication & Security**
+- **Better Auth**
+  - Handles user authentication flows (email/password sign-up and sign-in), session management, and secure token handling
+  - Provides a secure foundation for protecting sensitive business data
+  - Supports future extensions like role-based access control
+
+**Database & Data Management**
+- **PostgreSQL**
+  - A reliable, open-source relational database used for storing all business entities
+  - Handles complex relationships between materials, formulas, production batches, and costs
+  - Provides robust transaction support for financial calculations
+- **Drizzle ORM**
+  - A TypeScript-first Object Relational Mapper that makes database queries type-safe and easy to write
+  - Provides automatic migrations and schema management
+  - Ensures type safety from database to frontend
+
+**Data Processing & Calculations**
+- **decimal.js**
+  - High-precision decimal arithmetic library for financial calculations
+  - Ensures accurate COGS calculations and pricing computations
+  - Prevents floating-point errors in financial data
+- **Client-side Database Operations**
+  - Direct database connections from the client for optimal performance
+  - Reduces server load and provides responsive user experience
+  - Requires careful security configuration for data protection
+
+**Business Logic Architecture**
+The application implements a comprehensive business logic layer that handles:
+
+1. **Inventory Management Logic**
+   - Automatic code generation for materials, packaging, and labels
+   - Stock level tracking and reorder point calculations
+   - Cost calculation and currency management
+
+2. **Formulation Management**
+   - Percentage-based ingredient calculations with validation
+   - Version control and change tracking
+   - Automatic cost rollup based on material prices
+
+3. **COGS Calculation Engine**
+   - Real-time cost calculation for formulas
+   - Packaging and label cost allocation
+   - Pricing rule application and margin analysis
+
+4. **Production Tracking**
+   - Batch number generation and tracking
+   - Material consumption calculations
+   - Cost variance analysis
+
+How these components work together:
+
+1. A user signs up or signs in via the frontend form
+2. Better Auth processes the authentication request
+3. Once authenticated, users access the dashboard where client-side database operations begin
+4. Users manage inventory through forms that directly interact with PostgreSQL via Drizzle ORM
+5. Formulation calculations happen in real-time using decimal.js for precision
+6. COGS analysis runs automatically when material costs or formulas change
+7. All business logic maintains data integrity through type-safe operations and validation
+
+## Infrastructure and Deployment
+
+This section covers how we host, build, and ship the production management system:
+
+**Containerization & Development**
+- **Docker & Docker Compose**
+  - Containerize the application and PostgreSQL database to ensure a consistent environment from development through production
+  - Includes separate configurations for development and production environments
+  - Simplifies database setup and management across different platforms
+- **drizzle-kit**
+  - Database toolkit for migrations, schema management, and database studio
+  - Provides visual database browser for development and debugging
+  - Handles schema evolution without data loss
+
+**Cloud Deployment & Hosting**
+- **Vercel**
+  - The chosen cloud platform for deploying Next.js applications; offers automatic deployments from Git pushes, global CDN, and serverless functions
+  - Provides built-in SSL, automatic scaling, and performance optimization
+  - Supports edge functions for global performance
+- **PostgreSQL Hosting**
+  - Compatible with Vercel's Postgres service or external PostgreSQL providers
+  - Supports both development containers and production managed databases
+
+**Development & Deployment Tools**
 - **Git & GitHub**
-  - Version control system (Git) and remote hosting (GitHub) keep track of all code changes and allow team collaboration.
-- **Vercel (or Netlify)**
-  - A popular hosting service optimized for Next.js, with one-click deployments and global content delivery.
-  - Automatically rebuilds and deploys the site whenever code is pushed to the main branch.
-- **GitHub Actions (CI/CD)**
-  - Automates tasks like linting (ESLint), formatting (Prettier), and running any tests you add.
-  - Ensures that only clean, tested code goes live.
+  - Version control and code hosting. Teams collaborate via branches and pull requests
+  - Supports automated testing and deployment workflows
+- **Environment Variables Management**
+  - Store sensitive data (database URLs, secret keys) outside the codebase, referenced in `.env` files
+  - Supports different configurations for development, staging, and production
+- **dotenv**
+  - Environment variable loading for configuration management
+  - Ensures consistent configuration across different deployment environments
 
-Together, these tools provide a reliable, scalable setup where every code change is tested and deployed quickly, with minimal manual work.
+**Database Management Tools**
+- **Drizzle Migrations**
+  - Automatic schema migration generation and application
+  - Supports rollback capabilities for schema changes
+  - Provides version control for database structure
+- **Database Studio**
+  - Visual database browser for development and debugging
+  - Enables direct data inspection and query testing
+  - Supports multiple database connections
 
-## 4. Third-Party Integrations
-While this starter kit is minimal by design, it already includes or can easily add:
+**Benefits of this Infrastructure:**
 
-- **bcrypt**
-  - For secure password hashing (included as an npm dependency).
-- **NextAuth.js** (optional)
-  - A full-featured authentication library supporting email/password, OAuth, and more.
-- **Sentry or LogRocket** (optional)
-  - For real-time error tracking and performance monitoring in production.
+- **Consistency**: Docker ensures "it works on my machine" translates to every environment
+- **Scalability**: Vercel provides automatic scaling and global CDN for business applications
+- **Reliability**: PostgreSQL provides robust data storage with proper backup and restore capabilities
+- **Development Experience**: Comprehensive tooling for database management and debugging
+- **Security**: Environment variables and secure deployment practices protect sensitive business data
+- **Performance**: Client-side operations and global CDN ensure responsive application performance
+- **Maintainability**: Migration tools and version control ensure smooth updates and changes
 
-These integrations help extend the app’s capabilities without building every feature from scratch.
+## Third-Party Integrations
 
-## 5. Security and Performance Considerations
-We’ve baked in several measures to keep users safe and the app running smoothly:
+To provide comprehensive business management functionality, we rely on these services and libraries:
 
-Security:
-- Passwords are never stored in plain text—bcrypt hashes them with a random salt.
-- API routes can implement CSRF protection and input validation to block malicious requests.
-- Session tokens or cookies are marked secure and HttpOnly to prevent theft via JavaScript.
+**Authentication & Security**
+- **Better Auth** (as a third-party auth service)
+  - Outsources most of the security-critical authentication logic
+  - Provides battle-tested security patterns and session management
+  - Supports future extensions like multi-factor authentication
 
-Performance:
-- Server-side rendering (SSR) and static site generation (SSG) in Next.js deliver pages faster.
-- Code splitting and lazy-loaded components ensure users only download what they need.
-- Global CSS and theme files are small and cached by the browser for quick repeat visits.
+**UI Foundation & Accessibility**
+- **Radix UI** (under the hood of shadcn/ui)
+  - Provides accessible base components (dialogs, tooltips, menus, forms)
+  - Ensures WCAG compliance and keyboard navigation
+  - Delivers consistent behavior across different browsers and devices
 
-These strategies work together to give users a fast, secure experience every time.
+**Data Processing & Validation**
+- **Zod**
+  - Schema validation library ensuring data integrity
+  - Provides runtime type checking for form inputs and API responses
+  - Enables automatic type generation from schemas
 
-## 6. Conclusion and Overall Tech Stack Summary
-In building **codeguide-starter**, we chose technologies that:
+**Financial Calculations**
+- **decimal.js**
+  - Specialized library for precise decimal arithmetic
+  - Prevents floating-point errors in financial calculations
+  - Supports various rounding modes for business requirements
 
-- Align with modern web standards (Next.js, React, TypeScript).
-- Provide a clear, file-based project structure for rapid onboarding.
-- Offer built-in support for server-side rendering, API routes, and static assets.
-- Emphasize security through password hashing, session management, and safe defaults.
-- Enable easy scaling and future enhancements via modular code and optional integrations.
+**How these integrations enhance the business application:**
 
-This stack strikes a balance between simplicity for newcomers and flexibility for experienced teams. It accelerates development of a secure authentication flow and a polished dashboard, while leaving room to plug in databases, test suites, and advanced features as the project grows.
+- **Security**: Better Auth provides enterprise-grade authentication without building from scratch
+- **Accessibility**: Radix UI ensures the application is usable by all team members, regardless of abilities
+- **Data Integrity**: Zod validation prevents costly data entry errors and ensures business rule compliance
+- **Financial Accuracy**: decimal.js ensures precise cost calculations and pricing for business decisions
+- **Development Speed**: These libraries allow focus on business logic rather than infrastructure concerns
+
+## Security and Performance Considerations
+
+**Security Measures:**
+
+- **HTTPS/TLS** enforced in production (handled by Vercel) for all data transmission
+- **Environment Variables** for all secrets (database credentials, auth keys) preventing exposure in code
+- **Better Auth** for battle-tested authentication and secure session handling with secure cookies
+- **Drizzle ORM** prevents SQL injection by using parameterized queries and type-safe operations
+- **Input Validation** with Zod schemas ensuring all data meets business rules and security requirements
+- **Row-Level Security** for protecting sensitive business data and ensuring proper data access
+- **Client-Side Database Security** careful configuration to prevent unauthorized data access
+
+**Performance Optimizations:**
+
+- **Server-Side Rendering (SSR) & Static Generation (SSG)** in Next.js for faster initial loads
+- **Client-Side Database Operations** for responsive user interactions and reduced server load
+- **Advanced Data Tables** with virtualization for handling large datasets efficiently
+- **Tailwind CSS Purge** (built into the framework) to remove unused CSS and keep stylesheets small
+- **Docker** for fast, repeatable builds and deployments with consistent environments
+- **Vercel's CDN** to cache and serve assets globally for fast load times worldwide
+- **Decimal.js** for optimized financial calculations without performance overhead
+- **Lazy Loading** of heavy components and charts to improve initial page load times
+
+**Business-Specific Performance:**
+
+- **Optimized Database Queries** with proper indexing for inventory and formulation searches
+- **Efficient COGS Calculations** with cached results for frequently accessed cost data
+- **Pagination and Filtering** for large inventory and production datasets
+- **Real-time Validation** providing immediate feedback without server round-trips
+
+## Conclusion and Overall Tech Stack Summary
+
+This project combines modern, well-supported technologies to deliver a comprehensive, secure, and high-performance production management system:
+
+**Core Technologies:**
+- Frontend: Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, next-themes
+- Backend: Better Auth, Drizzle ORM, PostgreSQL with client-side operations
+- Infrastructure: Docker & Docker Compose, Vercel, GitHub, environment variables
+
+**Advanced UI & Data Management:**
+- UI Components: @tanstack/react-table, @dnd-kit/core, react-hook-form, @tabler/icons-react
+- Data Processing: decimal.js, zod, date-fns, recharts
+- User Experience: sonner, tailwind-merge, tw-animate-css
+
+**Business Logic Features:**
+- Complete inventory management with categories and auto-generated codes
+- Advanced formulation system with percentage-based calculations
+- Real-time COGS calculation and pricing analysis
+- Production batch tracking and material consumption monitoring
+
+**Security & Performance:**
+- Enterprise-grade authentication and session management
+- Type-safe database operations throughout the application
+- Optimized queries and efficient data table rendering
+- Global CDN and responsive design for worldwide access
+
+These choices align with our goals of providing a complete business management solution while maintaining excellent developer experience, data accuracy, and user-friendly interface. The stack provides a solid foundation for building, scaling, and maintaining a professional production management application that can grow with business needs.
+
+---
+**Document Details**
+- **Project ID**: 9abf8165-5741-488d-aa70-1677e11be201
+- **Document ID**: f579a472-8c0e-4586-935c-53ffabb95481
+- **Type**: custom
+- **Custom Type**: tech_stack_document
+- **Status**: completed
+- **Generated On**: 2025-10-15T15:43:10.351Z
+- **Last Updated**: N/A

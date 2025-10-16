@@ -1,41 +1,140 @@
 # App Flow Document
 
+# Paws-Management App Flow Document
+
 ## Onboarding and Sign-In/Sign-Up
+When a new visitor arrives at the application's root URL, the system checks whether they have an active session. If they do not, the visitor is automatically shown the sign-in page. From there, the visitor has the option to switch to the sign-up page by clicking the link labeled "Create an account." On the sign-up page, the user enters an email address, a password, and then confirms the password. When they submit the form, the client code calls the `/api/auth` endpoint, which uses Better Auth and Drizzle ORM to create a new user in the PostgreSQL database. Upon successful account creation, the user is redirected to the dashboard.
 
-When a new visitor arrives at the application’s root URL, they land on a welcome page that offers clear buttons or links to either create an account or sign in. Clicking on the “Sign Up” link takes the visitor to a registration page where they enter their email address and choose a password. Once they submit the form, the application sends a POST request to the authentication API endpoint, which handles password hashing and user creation. If registration succeeds, the new user is automatically signed in and redirected to the dashboard. If there are validation errors, such as a password that is too short or an email already in use, the form reappears with inline messages explaining what must be corrected.
+Existing users can go straight to the sign-in page where they enter their email and password. The form submission again routes to `/api/auth`, and if the credentials match a record in the database, the user is granted a session and taken to the dashboard. If a user ever wants to sign out, they click the "Sign Out" button in the application header, which calls the sign-out API and returns them to the sign-in page.
 
-For returning users, clicking the “Sign In” link from the welcome page or from a persistent header link opens the login form. They input their email and password, and upon submission the app sends a request to the same authentication API with login credentials. A successful login leads directly to the dashboard. If the credentials are invalid, the page reloads with a clear error message prompting the user to try again.
+## Main Dashboard and Business Overview
+Once authenticated, users land on a comprehensive dashboard designed for production management. The dashboard features a sidebar navigation organized into business functions:
 
-Signing out is available from within the dashboard via a logout button in the main navigation or header. When clicked, the application clears the user’s session or token, and then navigates back to the welcome page. Currently, there is no built-in password recovery or reset flow in this version, so users who forget their password are prompted to contact support for assistance.
+**PAW System Section** (Primary Business Operations):
+- **Raw Materials** - View and manage ingredient inventory
+- **Packaging** - Track containers, bottles, and packaging supplies
+- **Labels** - Manage product labels and printing costs
+- **Formulas** - Create and manage product formulations
+- **COGS Analysis** - Review cost calculations and pricing
 
-## Main Dashboard or Home Page
+The main dashboard displays key business metrics including inventory levels, recent production batches, and cost analysis summaries. All data operations are performed client-side for optimal performance, with direct database calls through Drizzle ORM.
 
-After authentication, the user lands on the dashboard, which serves as the main home page. The dashboard is wrapped in a layout that displays a header bar and a sidebar navigation tailored for logged-in users. The header bar typically shows the application’s logo on the left and a Logout link on the right. The sidebar sits on the left side of the screen and may contain links back to the dashboard’s main panel or to future features.
+## Detailed Business Feature Flows
 
-The central area of the dashboard page displays data pulled from a static JSON file. This content might appear in cards or tables to give users a quick overview of information. All styling for this section comes from a dedicated theme stylesheet to keep the look consistent. Users can click items or links here, but those actions are placeholders for future dynamic data features.
+### Inventory Management Workflows
 
-From this dashboard view, users may revisit the welcome page or any other main area by selecting navigation items in the sidebar or header. The layout ensures that the logout link remains accessible at all times, and that the user cannot leave the authenticated area without signing out manually or having their session expire.
+**Raw Materials Management:**
+1. User navigates to `/dashboard/inventory/materials` via the sidebar
+2. The page loads with a sortable, filterable data table showing all materials
+3. Each material displays: auto-generated code (e.g., "OIL-001"), name, category, supplier, current stock, cost per unit, and reorder point
+4. User can add new materials through a form that automatically generates codes based on category prefixes
+5. Stock levels are color-coded: green (healthy), yellow (low), red (critical)
+6. When stock falls below reorder point, the system highlights the material for reordering
 
-## Detailed Feature Flows and Page Transitions
+**Packaging and Labels Management:**
+1. Similar workflow to materials but with packaging-specific fields (size, type, material)
+2. Tracks packaging costs per unit and allocates them to product costs
+3. Label management includes printing costs and quantity tracking
 
-When a visitor lands on the root page, JavaScript on the client reads the route and displays either the welcome interface or automatically redirects them to the dashboard if a valid session exists. For new user registration, the user clicks the Sign Up link and is taken to the sign-up page. The sign-up form collects email and password fields, and on submission it triggers a client-side POST to the API route. Once the API responds with success, the client redirects the user to the dashboard page.
+### Formulation Management Workflow
 
-Returning users choose the Sign In link and arrive at the sign-in page, which offers the same fields as the sign-up page but is wired to authenticate rather than create a new account. On form submit, the user sees a loading indication until the API confirms valid credentials. If successful, the client pushes the dashboard route and loads the dashboard layout and content.
+**Creating New Formulas:**
+1. User navigates to `/dashboard/formulas` and clicks "Create New Formula"
+2. A drag-and-drop interface allows adding ingredients from the materials database
+3. User sets percentages for each ingredient with real-time validation that totals must equal 100%
+4. The system automatically calculates ingredient weights based on total batch size
+5. Material costs are automatically pulled to calculate formula cost per unit
+6. User can save formula as draft or active, with automatic version control
 
-All authenticated pages reside under the `/dashboard` path. When the user attempts to navigate directly to `/dashboard` without a valid session, server-side redirection logic intercepts the request and sends the user back to the sign-in page. This ensures that protected content never shows to unauthorized visitors.
+**Formula Version Control:**
+1. When modifying existing formulas, the system creates a new version
+2. All versions are accessible with change history and reasons for modifications
+3. Production batches are linked to specific formula versions for traceability
 
-Signing out happens entirely on the client side by calling an API or clearing a cookie, then navigating back to the welcome page. The client code listens for the logout action, invalidates the current session, and then reloads or reroutes the application state to the landing interface.
+### COGS Analysis Workflow
+
+**Real-Time Cost Calculation:**
+1. When material costs are updated, all dependent formulas automatically recalculate
+2. The COGS page shows cost breakdowns: materials, packaging, labels, labor, overhead
+3. Users can set pricing rules (percentage markup, target margins, fixed prices)
+4. The system calculates selling prices and profit margins
+5. Interactive charts show cost trends and margin analysis
+
+### Production Tracking Workflow
+
+**Creating Production Batches:**
+1. User selects a formula and creates a new production batch
+2. System generates unique batch numbers and calculates required material quantities
+3. User records actual material consumption and any variances
+4. The system calculates actual vs. planned costs for variance analysis
+5. Production history is maintained for quality control and cost tracking
+
+### Data Operations and Performance
+
+**Client-Side Database Operations:**
+All CRUD operations are performed directly from the client using database connections:
+1. Form submissions directly call database functions via Drizzle ORM
+2. Real-time validation provides immediate feedback
+3. Data tables update instantly without page refreshes
+4. Complex calculations (COGS, pricing) happen client-side for responsive experience
+5. All operations maintain data integrity through proper database transactions
+
+**Navigation and User Experience:**
+1. Sidebar navigation provides quick access to all business functions
+2. Breadcrumb navigation shows current location within the application
+3. Search and filtering capabilities allow finding specific materials, formulas, or batches
+4. Theme toggle persists user preference across sessions
+5. Responsive design ensures functionality on tablets and mobile devices
 
 ## Settings and Account Management
+Users manage their account mainly through the authentication system and the theme toggle. The application header always offers the toggle for dark or light mode, with preference persistence across sessions. Business settings are integrated into the relevant workflows:
 
-At present, users cannot change profile information, update their email, or configure notifications from within the interface. The only account management available is the ability to sign out from any dashboard view. In future iterations, a dedicated settings page could be added to let users update personal details or adjust preferences, but in this version, those capabilities are not provided. After signing out, users always return to the welcome page and must sign in again to regain access to the dashboard.
+- Material categories and code prefixes are managed within the materials section
+- Pricing rules and cost allocations are configured in the COGS analysis section
+- Production settings are handled within the formulation management interface
 
-## Error States and Alternate Paths
+## Error States and Data Validation
 
-If a user types an incorrect email or password on the sign-in page, the authentication API responds with an error status and a message. The form then displays an inline alert near the input fields explaining the issue, such as “Invalid email or password,” allowing the user to correct and resubmit. During sign up, validation errors like a missing field or weak password appear immediately under the relevant input.
+**Authentication Errors:**
+- Incorrect email/password during sign-in displays specific error messages
+- Duplicate email detection during sign-up with clear guidance
+- Network timeouts with retry options and user-friendly messaging
 
-Network failures trigger a generic error notification at the top of the form, informing the user that the request could not be completed and advising them to check their connection. If the dashboard content fails to load due to a broken or missing static data file, a fallback message appears in the main panel stating that data could not be loaded and suggesting a page refresh. Trying to access a protected route without a session sends the user to the sign-in page automatically, making it clear that authentication is required.
+**Business Logic Validation:**
+- Form formulation validation ensures percentages sum to exactly 100%
+- Material cost validation prevents negative values and ensures proper decimal formatting
+- Inventory level validation prevents stock levels below zero
+- Production batch validation ensures material availability before batch creation
 
-## Conclusion and Overall App Journey
+**Data Integrity Errors:**
+- Database transaction failures trigger automatic rollbacks with user notification
+- Concurrent editing detection warns users when multiple users modify the same record
+- Calculation errors in COGS are caught and displayed with specific error details
 
-A typical user journey starts with visiting the application’s root URL, signing up with an email and password, then being welcomed in the dashboard area that displays sample data. Returning users go directly through the sign-in page to the dashboard. Throughout each step, clear messages guide the user in case of errors or invalid input. The layout remains consistent, with a header and navigation ensuring that users always know where they are and can sign out at any time. This flow lays the foundation for adding dynamic data, user profile management, and richer features in future releases.
+**System Errors:**
+- Database connection issues display service availability status with retry functionality
+- Client-side operation failures provide clear error messages and recovery options
+- Import/export failures show specific data format requirements and validation errors
+
+## Business User Journey Summary
+
+A typical business user journey demonstrates the comprehensive production management capabilities:
+
+1. **Initial Setup**: User signs up and lands on the dashboard overview showing business metrics
+2. **Inventory Configuration**: User sets up material categories, suppliers, and initial inventory levels
+3. **Formulation Development**: User creates product formulations using drag-and-drop interface with real-time cost calculations
+4. **Production Planning**: User creates production batches with automatic material requirement calculations
+5. **Cost Analysis**: User reviews COGS breakdowns and sets pricing rules for profitability
+6. **Ongoing Operations**: User continuously updates material costs, monitors inventory levels, and tracks production efficiency
+
+The application provides a complete business workflow from raw material procurement through production to cost analysis and pricing decisions. All operations are optimized for performance with client-side database interactions and real-time calculations, ensuring business users can make informed decisions quickly and accurately.
+
+---
+**Document Details**
+- **Project ID**: 9abf8165-5741-488d-aa70-1677e11be201
+- **Document ID**: 809bc341-e448-4e26-84df-0aa4dd2b77a8
+- **Type**: custom
+- **Custom Type**: app_flow_document
+- **Status**: completed
+- **Generated On**: 2025-10-15T15:42:12.946Z
+- **Last Updated**: N/A
