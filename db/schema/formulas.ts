@@ -8,22 +8,28 @@ import {
   index
 } from "drizzle-orm/pg-core";
 import { materials } from "./inventory";
+import { products } from "./products";
 
 // Formulas table
 export const formulas = pgTable("formulas", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
   version: integer("version").default(1).notNull(),
-  status: text("status").default("draft").notNull(), // 'draft', 'active', 'archived'
+  status: text("status").default("Draft").notNull(), // 'Draft', 'Trials', 'Pre-Production', 'Approved'
   totalWeight: decimal("total_weight", { precision: 10, scale: 2 }).notNull(), // in grams or ml
   unit: text("unit").notNull(), // 'g' for grams, 'ml' for ml
   notes: text("notes"),
+  trialResults: text("trial_results"), // Store trial results and observations
+  approvedDate: timestamp("approved_date"), // Date when formula was approved
+  approvedBy: text("approved_by"), // User who approved the formula
   createdBy: text("created_by").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
+  productIdx: index("formulas_product_idx").on(table.productId),
   nameIdx: index("formulas_name_idx").on(table.name),
   statusIdx: index("formulas_status_idx").on(table.status),
   createdByIdx: index("formulas_created_by_idx").on(table.createdBy),
@@ -55,6 +61,8 @@ export const formulaIngredients = pgTable("formula_ingredients", {
   materialId: text("material_id").notNull().references(() => materials.id, { onDelete: "restrict" }),
   percentage: decimal("percentage", { precision: 5, scale: 2 }).notNull(), // Should sum to 100%
   weight: decimal("weight", { precision: 10, scale: 2 }).notNull(), // Actual weight in g or ml
+  qs: decimal("qs", { precision: 5, scale: 2 }).notNull().default(0), // QS value (100 - sum of all material percentages)
+  isQsIngredient: boolean("is_qs_ingredient").default(false).notNull(), // Mark if this is the QS ingredient
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({

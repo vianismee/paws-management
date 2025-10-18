@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, formulas, formulaVersions, formulaIngredients, materials } from '@/db';
-import { eq, ilike, and, desc, asc, sum } from 'drizzle-orm';
+import { db, formulas, products, formulaVersions, formulaIngredients, materials } from '@/db';
+import { eq, ilike, and, desc, asc, sum, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import Decimal from 'decimal.js';
 
@@ -8,23 +8,33 @@ import Decimal from 'decimal.js';
 const FormulasQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
-  search: z.string().optional(),
-  status: z.enum(['draft', 'active', 'archived']).optional(),
-  isActive: z.coerce.boolean().optional(),
-  createdBy: z.string().optional(),
-  sortBy: z.enum(['name', 'version', 'status', 'totalWeight', 'createdAt']).default('name'),
-  sortOrder: z.enum(['asc', 'desc']).default('asc'),
+  search: z.string().nullable().optional(),
+  status: z.enum(['Draft', 'Trials', 'Pre-Production', 'Approved']).nullable().optional(),
+  isActive: z.string().nullable().optional().transform((val) => val === 'true' ? true : val === 'false' ? false : undefined),
+  createdBy: z.string().nullable().optional(),
+  productId: z.string().nullable().optional(),
+  sortBy: z.string().nullable().optional().transform((val) => {
+    if (!val || val === 'null') return 'name'
+    if (['name', 'version', 'status', 'totalWeight', 'createdAt'].includes(val)) return val
+    return 'name'
+  }),
+  sortOrder: z.string().nullable().optional().transform((val) => {
+    if (!val || val === 'null') return 'asc'
+    if (['asc', 'desc'].includes(val)) return val
+    return 'asc'
+  }),
 });
 
 // Formula creation schema for POST /api/formulas
 const CreateFormulaSchema = z.object({
+  productId: z.string().min(1, 'Product is required'),
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   totalWeight: z.number().min(0, 'Total weight must be non-negative'),
-  unit: z.enum(['g', 'ml'], {
+  unit: z.enum(['g', 'ml', 'kg', 'L'], {
     errorMap: (issue, ctx) => {
       if (issue.code === 'invalid_enum_value') {
-        return { message: 'Unit must be either g (grams) or ml (milliliters)' };
+        return { message: 'Unit must be g, ml, kg, or L' };
       }
       return { message: ctx.defaultError };
     },
@@ -68,6 +78,7 @@ export async function GET(request: NextRequest) {
       status: searchParams.get('status'),
       isActive: searchParams.get('isActive'),
       createdBy: searchParams.get('createdBy'),
+      productId: searchParams.get('productId'),
       sortBy: searchParams.get('sortBy'),
       sortOrder: searchParams.get('sortOrder'),
     });
@@ -79,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     if (query.search) {
       whereConditions.push(
-        ilike(formulas.name, `%${query.search}%`)
+        sql`(${formulas.name} ILIKE ${'%' + query.search + '%'} OR ${products.name} ILIKE ${'%' + query.search + '%'})`
       );
     }
 
@@ -93,6 +104,10 @@ export async function GET(request: NextRequest) {
 
     if (query.createdBy) {
       whereConditions.push(eq(formulas.createdBy, query.createdBy));
+    }
+
+    if (query.productId) {
+      whereConditions.push(eq(formulas.productId, query.productId));
     }
 
     // Determine sort column and order
@@ -110,19 +125,25 @@ export async function GET(request: NextRequest) {
     const result = await db
       .select({
         id: formulas.id,
+        productId: formulas.productId,
         name: formulas.name,
+        productName: products.name,
         description: formulas.description,
         version: formulas.version,
         status: formulas.status,
         totalWeight: formulas.totalWeight,
         unit: formulas.unit,
         notes: formulas.notes,
+        trialResults: formulas.trialResults,
+        approvedDate: formulas.approvedDate,
+        approvedBy: formulas.approvedBy,
         createdBy: formulas.createdBy,
         isActive: formulas.isActive,
         createdAt: formulas.createdAt,
         updatedAt: formulas.updatedAt,
       })
       .from(formulas)
+      .leftJoin(products, eq(formulas.productId, products.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
       .orderBy(sortDirection(sortColumn))
       .limit(query.limit)
@@ -130,8 +151,9 @@ export async function GET(request: NextRequest) {
 
     // Get total count for pagination
     const [{ count }] = await db
-      .select({ count: formulas.id })
+      .select({ count: sql<number>`count(*)` })
       .from(formulas)
+      .leftJoin(products, eq(formulas.productId, products.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
     const totalPages = Math.ceil(Number(count) / query.limit);
@@ -175,10 +197,11 @@ export async function POST(request: NextRequest) {
       .insert(formulas)
       .values({
         id: crypto.randomUUID(),
+        productId: validatedData.productId,
         name: validatedData.name,
         description: validatedData.description,
         version: 1,
-        status: 'draft',
+        status: 'Draft',
         totalWeight: new Decimal(validatedData.totalWeight).toString(),
         unit: validatedData.unit,
         notes: validatedData.notes,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, formulas, formulaVersions, formulaIngredients } from '@/db';
+import { db, formulas, products, formulaVersions, formulaIngredients, materials } from '@/db';
 import { eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
 import Decimal from 'decimal.js';
@@ -8,7 +8,7 @@ import Decimal from 'decimal.js';
 const UpdateFormulaSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
-  status: z.enum(['draft', 'active', 'archived']).optional(),
+  status: z.enum(['Draft', 'Trials', 'Pre-Production', 'Approved']).optional(),
   totalWeight: z.number().min(0).optional(),
   unit: z.enum(['g', 'ml']).optional(),
   notes: z.string().optional(),
@@ -26,10 +26,33 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
+    // Get the formula with product information
     const [formula] = await db
-      .select()
+      .select({
+        id: formulas.id,
+        productId: formulas.productId,
+        name: formulas.name,
+        description: formulas.description,
+        version: formulas.version,
+        status: formulas.status,
+        totalWeight: formulas.totalWeight,
+        unit: formulas.unit,
+        notes: formulas.notes,
+        trialResults: formulas.trialResults,
+        approvedDate: formulas.approvedDate,
+        approvedBy: formulas.approvedBy,
+        createdBy: formulas.createdBy,
+        isActive: formulas.isActive,
+        createdAt: formulas.createdAt,
+        updatedAt: formulas.updatedAt,
+        productName: products.name,
+        productDescription: products.description,
+      })
       .from(formulas)
-      .where(eq(formulas.id, params.id))
+      .leftJoin(products, eq(formulas.productId, products.id))
+      .where(eq(formulas.id, id))
       .limit(1);
 
     if (!formula) {
@@ -39,19 +62,34 @@ export async function GET(
       );
     }
 
-    // Get the latest version of this formula
-    const [latestVersion] = await db
-      .select()
-      .from(formulaVersions)
-      .where(eq(formulaVersions.formulaId, params.id))
-      .orderBy(desc(formulaVersions.version))
-      .limit(1);
+    // Get ingredients for the formula
+    const ingredients = await db
+      .select({
+        id: formulaIngredients.id,
+        materialId: formulaIngredients.materialId,
+        materialName: materials.name,
+        percentage: formulaIngredients.percentage,
+        weight: formulaIngredients.weight,
+        qs: formulaIngredients.qs,
+        isQsIngredient: formulaIngredients.isQsIngredient,
+        notes: formulaIngredients.notes,
+      })
+      .from(formulaIngredients)
+      .leftJoin(materials, eq(formulaIngredients.materialId, materials.id))
+      .where(eq(formulaIngredients.formulaVersionId, id)); // Simplified for now
 
     return NextResponse.json({
-      data: {
-        ...formula,
-        latestVersion,
-      },
+      ...formula,
+      ingredients: ingredients.map(ing => ({
+        id: ing.id,
+        materialId: ing.materialId,
+        materialName: ing.materialName || 'Unknown Material',
+        percentage: parseFloat(ing.percentage?.toString() || '0'),
+        weight: parseFloat(ing.weight?.toString() || '0'),
+        qs: parseFloat(ing.qs?.toString() || '0'),
+        isQsIngredient: ing.isQsIngredient || false,
+        notes: ing.notes,
+      })),
     });
   } catch (error) {
     console.error('Error fetching formula:', error);
@@ -68,6 +106,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const validatedData = UpdateFormulaSchema.parse(body);
 
@@ -75,7 +114,7 @@ export async function PUT(
     const [existingFormula] = await db
       .select()
       .from(formulas)
-      .where(eq(formulas.id, params.id))
+      .where(eq(formulas.id, id))
       .limit(1);
 
     if (!existingFormula) {
@@ -100,7 +139,7 @@ export async function PUT(
     const [updatedFormula] = await db
       .update(formulas)
       .set(updateData)
-      .where(eq(formulas.id, params.id))
+      .where(eq(formulas.id, id))
       .returning();
 
     return NextResponse.json({
@@ -138,11 +177,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     // Check if formula exists
     const [existingFormula] = await db
       .select()
       .from(formulas)
-      .where(eq(formulas.id, params.id))
+      .where(eq(formulas.id, id))
       .limit(1);
 
     if (!existingFormula) {
@@ -160,7 +201,7 @@ export async function DELETE(
         status: 'archived',
         updatedAt: new Date(),
       })
-      .where(eq(formulas.id, params.id))
+      .where(eq(formulas.id, id))
       .returning();
 
     return NextResponse.json({

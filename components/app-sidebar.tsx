@@ -68,19 +68,36 @@ const staticData = {
       ],
     },
     {
-      title: "Formulation Management",
-      url: "#",
-      icon: IconFlask,
+      title: "Product Management",
+      url: "/dashboard/products",
+      icon: IconPackage,
       items: [
         {
-          title: "Formulas",
-          url: "/dashboard/formulas",
-          description: "Create and manage product formulas",
+          title: "Products",
+          url: "/dashboard/products",
+          description: "Manage product catalog and pricing",
         },
         {
-          title: "Production Batches",
-          url: "/dashboard/production",
-          description: "Track production batches and material usage",
+          title: "Formulation Management",
+          url: "#",
+          icon: IconFlask,
+          items: [
+            {
+              title: "Formulas Dashboard",
+              url: "/dashboard/formulas",
+              description: "Formula overview and statistics",
+            },
+            {
+              title: "Manage Formulas",
+              url: "/dashboard/formulas/manage",
+              description: "Create and manage product formulas",
+            },
+            {
+              title: "Production Batches",
+              url: "/dashboard/production",
+              description: "Track production batches and material usage",
+            },
+          ],
         },
       ],
     },
@@ -187,7 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <Link href="/">
                 <Image src="/codeguide-logo.png" alt="PAWS Management" width={32} height={32} className="rounded-lg" />
-                <span className="text-base font-semibold font-parkinsans">PAWS Management</span>
+                <span className="text-base font-semibold font-inter">PAWS Management</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

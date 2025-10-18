@@ -15,6 +15,34 @@
       "when": 1760543715388,
       "tag": "0001_furry_weapon_omega",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760760763018,
+      "tag": "0002_perpetual_firebrand",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1760844000000,
+      "tag": "0003_update_products_pricing",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760763894784,
+      "tag": "0004_cultured_clea",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760763986205,
+      "tag": "0005_huge_jazinda",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "products" ALTER COLUMN "volume" DROP NOT NULL;

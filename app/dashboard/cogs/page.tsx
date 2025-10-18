@@ -39,6 +39,7 @@ import {
   IconTrendingUp,
   IconTrendingDown,
 } from "@tabler/icons-react";
+import { formatIDR } from "@/lib/currency";
 
 // Types
 interface CogsCalculation {
@@ -206,10 +207,7 @@ export default function CogsPage() {
     : 0;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    return formatIDR(amount);
   };
 
   return (
