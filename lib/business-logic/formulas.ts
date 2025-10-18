@@ -5,15 +5,16 @@ import {
   formulas,
   formulaVersions,
   formulaIngredients,
-  productionBatches,
-  materials,
-  type Formula,
-  type FormulaVersion,
-  type FormulaIngredient,
-  type ProductionBatch,
-  type Material
-} from '../schema/formulas';
-import { materials as inventoryMaterials } from '../schema/inventory';
+  productionBatches
+} from '../../db/schema/formulas';
+import { materials } from '../../db/schema/inventory';
+
+// Type definitions
+type Formula = typeof formulas.$inferSelect;
+type FormulaVersion = typeof formulaVersions.$inferSelect;
+type FormulaIngredient = typeof formulaIngredients.$inferSelect;
+type ProductionBatch = typeof productionBatches.$inferSelect;
+type Material = typeof materials.$inferSelect;
 
 // Formulas
 export async function getFormulas(options?: {

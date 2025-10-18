@@ -7,17 +7,17 @@ import {
   formulaPricing,
   pricingRules,
   formulaPackaging,
-  formulaLabels,
-  packaging,
-  labels,
-  materials,
-  type CogsCalculation,
-  type MaterialCostBreakdown,
-  type FormulaPricing,
-  type PricingRule
-} from '../schema/cogs';
-import { formulaIngredients, formulaVersions } from '../schema/formulas';
-import { inventoryMaterials } from '../schema/inventory';
+  formulaLabels
+} from '../../db/schema/cogs';
+
+// Type definitions
+type CogsCalculation = typeof cogsCalculations.$inferSelect;
+type MaterialCostBreakdown = typeof materialCostBreakdown.$inferSelect;
+type FormulaPricing = typeof formulaPricing.$inferSelect;
+type PricingRule = typeof pricingRules.$inferSelect;
+import { packaging, labels, materials } from '../../db/schema/inventory';
+import { formulaIngredients, formulaVersions } from '../../db/schema/formulas';
+import { inventoryMaterials } from '../../db/schema/inventory';
 
 // COGS Calculations
 export interface CostBreakdown {

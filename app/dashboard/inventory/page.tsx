@@ -747,11 +747,18 @@ export default function InventoryPage() {
                       </span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/inventory/${alert.type}s`}>
-                      View
-                    </Link>
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/dashboard/inventory/${alert.type === 'packaging' ? 'packaging' : alert.type + 's'}`}>
+                        View All
+                      </Link>
+                    </Button>
+                    <Button variant="default" size="sm" asChild>
+                      <Link href={`/dashboard/inventory/${alert.type === 'packaging' ? 'packaging' : alert.type + 's'}/${alert.id}`}>
+                        View Details
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

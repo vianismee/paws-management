@@ -47,7 +47,7 @@ const staticData = {
     },
     {
       title: "Inventory Management",
-      url: "#",
+      url: "/dashboard/inventory",
       icon: IconPackage,
       items: [
         {

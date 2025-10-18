@@ -68,6 +68,7 @@ import {
   IconPackage,
   IconTag,
   IconCalculator,
+  IconEye,
 } from "@tabler/icons-react";
 
 // Types
@@ -1233,6 +1234,14 @@ export default function MaterialsPage() {
                             >
                               <IconEdit className="mr-2 h-4 w-4" />
                               Edit Material
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              asChild
+                            >
+                              <Link href={`/dashboard/inventory/materials/${material.id}`}>
+                                <IconEye className="mr-2 h-4 w-4" />
+                                View Details
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <AlertDialog>

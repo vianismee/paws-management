@@ -10,7 +10,7 @@ import type {
   ProductionBatch,
   CogsCalculation,
   PricingRule
-} from '../client-db';
+} from '../client-db-client';
 
 // Types
 export interface MaterialWithCategory extends Material {

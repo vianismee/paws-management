@@ -55,6 +55,7 @@ import {
   IconTrash,
   IconPackage,
   IconCalculator,
+  IconEye,
 } from "@tabler/icons-react";
 
 // Types
@@ -924,6 +925,14 @@ export default function PackagingPage() {
                             >
                               <IconEdit className="mr-2 h-4 w-4" />
                               Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              asChild
+                            >
+                              <Link href={`/dashboard/inventory/packaging/${item.id}`}>
+                                <IconEye className="mr-2 h-4 w-4" />
+                                View Details
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem

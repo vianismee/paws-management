@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Package,
-  Flask,
+  Beaker,
   Calculator,
   TrendingUp,
   AlertTriangle,
@@ -141,7 +141,7 @@ export default function DashboardPage() {
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/dashboard/formulas">
-                  <Flask className="h-4 w-4 mr-2" />
+                  <Beaker className="h-4 w-4 mr-2" />
                   Create Formula
                 </Link>
               </Button>
@@ -167,7 +167,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Formulas</CardTitle>
-              <Flask className="h-4 w-4 text-muted-foreground" />
+              <Beaker className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeFormulas}</div>
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Flask className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <Beaker className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">No production batches yet</p>
                   <Button asChild className="mt-4" variant="outline">
                     <Link href="/dashboard/production">Create First Batch</Link>
@@ -368,7 +368,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Flask className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <Beaker className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">No active formulas</p>
                   <Button asChild className="mt-4" variant="outline">
                     <Link href="/dashboard/formulas">Create Formula</Link>

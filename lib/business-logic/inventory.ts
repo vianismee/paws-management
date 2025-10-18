@@ -1,6 +1,12 @@
 import { eq, desc, asc, like, sql } from 'drizzle-orm';
 import { clientDb, executeDbOperation } from '../client-db';
-import { materials, categories, packaging, labels, type Category, type Material, type Packaging, type Label } from '../schema/inventory';
+import { materials, categories, packaging, labels } from '../../db/schema/inventory';
+
+// Type definitions
+type Category = typeof categories.$inferSelect;
+type Material = typeof materials.$inferSelect;
+type Packaging = typeof packaging.$inferSelect;
+type Label = typeof labels.$inferSelect;
 
 // Categories
 export async function getCategories(): Promise<Category[]> {
